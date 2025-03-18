@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlowGuide - AI Skin Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #FF7E67;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3F72AF;
+        }
+        .results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GlowGuide</h1>
+    <p>Analyze your skin type and get personalized recommendations</p>
+
+    <!-- Webcam -->
+    <video id="videoElement" autoplay></video>
+
+    <!-- Buttons -->
+    <div>
+        <button id="analyzeBtn">Analyze Skin</button>
+        <button id="stopCameraBtn">Stop Camera</button>
+    </div>
+
+    <!-- Results -->
+    <div class="results" id="resultsSection" style="display: none;">
+        <h3>Skin Type: <span id="skinTypeResult"></span></h3>
+        <ul id="routineList"></ul>
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('videoElement');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const stopCameraBtn = document.getElementById('stopCameraBtn');
+        const resultsSection = document.getElementById('resultsSection');
+        const skinTypeResult = document.getElementById('skinTypeResult');
+        const routineList = document.getElementById('routineList');
+
+        let stream;
+
+        // Start the camera
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+            } catch (error) {
+                alert('Unable to access the camera. Please check your permissions.');
+            }
+        }
+
+        // Stop the camera
+        function stopCamera() {
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                videoElement.srcObject = null;
+            }
+        }
+
+        // Analyze skin (POST request)
+        analyzeBtn.addEventListener('click', async () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+            const imageSrc = canvas.toDataURL('image/jpeg'); // Convert image to Base64
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/analyze_skin', {
+                    method: 'POST', // Use POST method
+                    headers: { 'Content-Type': 'application/json' }, // Tell the backend we're sending JSON
+                    body: JSON.stringify({ image: imageSrc }), // Send the Base64 image
+                });
+
+                const data = await response.json();
+
+                // Display results
+                resultsSection.style.display = 'block';
+                skinTypeResult.textContent = data.skin_type;
+                routineList.innerHTML = '';
+                data.recommended_products.forEach(product => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="${product.link}" target="_blank">${product.name}</a>`;
+                    routineList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error analyzing skin:', error);
+                alert('Failed to analyze skin. Make sure the backend is running!');
+            }
+
+            stopCamera();
+        });
+
+        // Stop camera button
+        stopCameraBtn.addEventListener('click', () => {
+            stopCamera();
+            resultsSection.style.display = 'none';
+        });
+
+        // Start the camera on page load
+        window.onload = startCamera;
+    </script>
+</body>
+</html>
