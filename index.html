@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlowGuide - AI Skin Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>GlowGuide</h1>
+    </header>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Discover Your Perfect Skin Routine</h1>
+            <p>AI-powered skin analysis with personalized recommendations</p>
+        </section>
+
+        <!-- Camera Interface -->
+        <section class="camera-section">
+            <div class="camera-frame">
+                <video id="videoElement" autoplay style="display: none;"></video>
+                <canvas id="capturedImageCanvas" style="display: none; width: 100%; max-width: 800px;"></canvas>
+                <div class="controls">
+                    <button id="startCameraBtn" class="btn btn-secondary">
+                        <i class="fas fa-video"></i> Start Camera
+                    </button>
+                    <button id="captureBtn" class="btn" style="display: none;">
+                        <i class="fas fa-camera"></i> Capture Image
+                    </button>
+                    <button id="analyzeBtn" class="btn" style="display: none;">
+                        <i class="fas fa-microscope"></i> Analyze Now
+                    </button>
+                    <button id="stopCameraBtn" class="btn btn-secondary" style="display: none;">
+                        <i class="fas fa-video-slash"></i> Stop Camera
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-grid" id="resultsSection" style="display: none;">
+            <div class="result-card">
+                <h3>Skin Type Analysis</h3>
+                <p id="skinTypeResult">Analyzing...</p>
+            </div>
+
+            <div class="result-card">
+                <h3>Daily Routine</h3>
+                <ul id="routineList">
+                    <!-- Recommendations will be added dynamically -->
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2023 GlowGuide. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
